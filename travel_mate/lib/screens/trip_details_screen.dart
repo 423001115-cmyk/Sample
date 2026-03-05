@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../models/trip.dart';
 import '../models/destination.dart';
 import '../providers/trip_provider.dart';
+import '../providers/settings_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/gradient_background.dart';
 import '../widgets/glass_card.dart';
@@ -34,7 +35,10 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
               child: Center(
                 child: Text(
                   'Trip not found',
-                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 18),
+                  style: TextStyle(
+                    color: AppTheme.getTextPrimaryColor(context),
+                    fontSize: 18,
+                  ),
                 ),
               ),
             ),
@@ -99,13 +103,27 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                     color: Colors.white.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     CupertinoIcons.back,
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.getTextPrimaryColor(context),
                   ),
                 ),
               ),
               const Spacer(),
+              Consumer<SettingsProvider>(
+                builder: (context, settings, child) {
+                  return IconButton(
+                    onPressed: () => settings.toggleTheme(),
+                    icon: Icon(
+                      settings.isDarkMode
+                          ? CupertinoIcons.sun_max
+                          : CupertinoIcons.moon,
+                      size: 24,
+                      color: AppTheme.getTextPrimaryColor(context),
+                    ),
+                  );
+                },
+              ),
               PopupMenuButton<String>(
                 icon: Container(
                   padding: const EdgeInsets.all(8),
@@ -113,9 +131,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                     color: Colors.white.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     CupertinoIcons.ellipsis,
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.getTextPrimaryColor(context),
                   ),
                 ),
                 onSelected: (value) {
@@ -127,8 +145,6 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                     );
                   } else if (value == 'delete') {
                     _showDeleteConfirmation(context, trip.id);
-                  } else if (value == 'settings') {
-                    Navigator.pushNamed(context, '/settings');
                   }
                 },
                 itemBuilder: (context) => [
@@ -155,16 +171,6 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                       ],
                     ),
                   ),
-                  const PopupMenuItem(
-                    value: 'settings',
-                    child: Row(
-                      children: [
-                        Icon(CupertinoIcons.settings, size: 20),
-                        SizedBox(width: 12),
-                        Text('Settings'),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ],
@@ -176,10 +182,10 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
               color: Colors.transparent,
               child: Text(
                 trip.name,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.textPrimary,
+                  color: AppTheme.getTextPrimaryColor(context),
                 ),
               ),
             ),
@@ -197,7 +203,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                 '${dateFormat.format(trip.startDate)} - ${dateFormat.format(trip.endDate)}',
                 style: TextStyle(
                   fontSize: 15,
-                  color: AppTheme.textSecondary.withValues(alpha: 0.8),
+                  color: AppTheme.getTextSecondaryColor(
+                    context,
+                  ).withValues(alpha: 0.8),
                 ),
               ),
             ],
@@ -208,7 +216,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
               trip.description,
               style: TextStyle(
                 fontSize: 15,
-                color: AppTheme.textSecondary.withValues(alpha: 0.8),
+                color: AppTheme.getTextSecondaryColor(
+                  context,
+                ).withValues(alpha: 0.8),
               ),
             ),
           ],
@@ -218,160 +228,70 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   }
 
   Widget _buildProgressSection(Trip trip) {
-    final completionPercent = (trip.completionPercentage * 100).toInt();
-
+    final percent = (trip.completionPercentage * 100).toInt();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: GlassCard(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Trip Progress',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.textPrimary,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: AppTheme.primaryGradient,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    '$completionPercent%',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 12),
+          Text(
+            'Completion',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.getTextSecondaryColor(context),
             ),
-            const SizedBox(height: 16),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: LinearProgressIndicator(
-                value: trip.completionPercentage,
-                minHeight: 10,
-                backgroundColor: Colors.grey.shade200,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  Color.lerp(
-                    AppTheme.primaryBlue,
-                    AppTheme.primaryTeal,
-                    trip.completionPercentage,
-                  )!,
+          ),
+          const SizedBox(height: 8),
+          Stack(
+            children: [
+              Container(
+                height: 8,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(4),
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatItem(
-                  icon: CupertinoIcons.map_pin,
-                  label: 'Destinations',
-                  value: '${trip.destinations.length}',
+              Container(
+                height: 8,
+                width: percent == 0 ? 0 : percent.toDouble() * 2.4,
+                decoration: BoxDecoration(
+                  gradient: AppTheme.primaryGradient,
+                  borderRadius: BorderRadius.circular(4),
                 ),
-                _buildStatItem(
-                  icon: CupertinoIcons.checkmark_circle,
-                  label: 'Completed',
-                  value: '${trip.completedActivitiesCount}',
-                ),
-                _buildStatItem(
-                  icon: CupertinoIcons.list_bullet,
-                  label: 'Total',
-                  value: '${trip.totalActivities}',
-                ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
-    );
-  }
-
-  Widget _buildStatItem({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Column(
-      children: [
-        Icon(icon, color: AppTheme.primaryBlue, size: 24),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: AppTheme.textPrimary,
-          ),
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: AppTheme.textSecondary.withValues(alpha: 0.8),
-          ),
-        ),
-      ],
     );
   }
 
   Widget _buildDestinationsHeader(BuildContext context, Trip trip) {
     return Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.symmetric(horizontal: 24).copyWith(top: 24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
+          Text(
             'Destinations',
             style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.getTextPrimaryColor(context),
             ),
           ),
-          GestureDetector(
-            onTap: () {
+          IconButton(
+            icon: const Icon(CupertinoIcons.plus),
+            color: AppTheme.primaryBlue,
+            onPressed: () {
               Navigator.pushNamed(
                 context,
                 '/add-destination',
                 arguments: trip.id,
               );
             },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                gradient: AppTheme.primaryGradient,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(CupertinoIcons.add, color: Colors.white, size: 18),
-                  SizedBox(width: 4),
-                  Text(
-                    'Add',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ),
         ],
       ),
@@ -379,36 +299,16 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   }
 
   Widget _buildEmptyDestinations() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: GlassCard(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          children: [
-            Icon(
-              CupertinoIcons.map,
-              size: 48,
-              color: AppTheme.primaryBlue.withValues(alpha: 0.3),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No destinations yet',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.textSecondary.withValues(alpha: 0.8),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Add destinations to start planning your trip',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppTheme.textSecondary.withValues(alpha: 0.6),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+        child: Text(
+          'No destinations yet. Tap the + button to add one!',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: AppTheme.getTextSecondaryColor(context),
+            fontSize: 16,
+          ),
         ),
       ),
     );
@@ -417,359 +317,117 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
   Widget _buildDestinationCard(
     BuildContext context,
     String tripId,
-    Destination destination,
+    Destination dest,
   ) {
-    final isExpanded = _expandedDestinations[destination.id] ?? false;
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      child: GlassCard(
-        padding: EdgeInsets.zero,
-        child: Column(
-          children: [
-            InkWell(
-              onTap: () {
-                setState(() {
-                  _expandedDestinations[destination.id] = !isExpanded;
-                });
-              },
-              borderRadius: BorderRadius.circular(24),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        gradient: AppTheme.primaryGradient,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        CupertinoIcons.map_pin_ellipse,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            destination.name,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: AppTheme.textPrimary,
-                            ),
-                          ),
-                          if (destination.location.isNotEmpty) ...[
-                            const SizedBox(height: 4),
-                            Text(
-                              destination.location,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppTheme.textSecondary.withValues(
-                                  alpha: 0.8,
-                                ),
-                              ),
-                            ),
-                          ],
-                          const SizedBox(height: 4),
-                          Text(
-                            '${destination.activities.length} activities',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: AppTheme.primaryTeal,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        PopupMenuButton<String>(
-                          icon: Icon(
-                            CupertinoIcons.ellipsis_vertical,
-                            color: AppTheme.textSecondary,
-                          ),
-                          onSelected: (value) {
-                            if (value == 'edit') {
-                              Navigator.pushNamed(
-                                context,
-                                '/edit-destination',
-                                arguments: {
-                                  'tripId': tripId,
-                                  'destinationId': destination.id,
-                                },
-                              );
-                            } else if (value == 'delete') {
-                              _showDeleteDestinationConfirmation(
-                                context,
-                                tripId,
-                                destination.id,
-                              );
-                            }
-                          },
-                          itemBuilder: (context) => [
-                            const PopupMenuItem(
-                              value: 'edit',
-                              child: Row(
-                                children: [
-                                  Icon(CupertinoIcons.pencil, size: 20),
-                                  SizedBox(width: 12),
-                                  Text('Edit'),
-                                ],
-                              ),
-                            ),
-                            const PopupMenuItem(
-                              value: 'delete',
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    CupertinoIcons.trash,
-                                    size: 20,
-                                    color: Colors.red,
-                                  ),
-                                  SizedBox(width: 12),
-                                  Text(
-                                    'Delete',
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        AnimatedRotation(
-                          turns: isExpanded ? 0.5 : 0,
-                          duration: const Duration(milliseconds: 200),
-                          child: Icon(
-                            CupertinoIcons.chevron_down,
-                            color: AppTheme.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            AnimatedCrossFade(
-              firstChild: const SizedBox.shrink(),
-              secondChild: _buildExpandedContent(context, tripId, destination),
-              crossFadeState: isExpanded
-                  ? CrossFadeState.showSecond
-                  : CrossFadeState.showFirst,
-              duration: const Duration(milliseconds: 300),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildExpandedContent(
-    BuildContext context,
-    String tripId,
-    Destination destination,
-  ) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+    final expanded = _expandedDestinations[dest.id] ?? false;
+    return GlassCard(
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (destination.notes.isNotEmpty) ...[
-            Text(
-              destination.notes,
-              style: TextStyle(
-                fontSize: 14,
-                color: AppTheme.textSecondary.withValues(alpha: 0.8),
-              ),
-            ),
-            const SizedBox(height: 16),
-          ],
-          const Divider(),
-          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Activities',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.textPrimary,
+              Expanded(
+                child: Text(
+                  dest.name,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.getTextPrimaryColor(context),
+                  ),
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    '/add-activity',
-                    arguments: {
-                      'tripId': tripId,
-                      'destinationId': destination.id,
-                    },
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryTeal.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: AppTheme.primaryTeal.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        CupertinoIcons.add,
-                        color: AppTheme.primaryTeal,
-                        size: 16,
-                      ),
-                      SizedBox(width: 4),
-                      Text(
-                        'Add',
-                        style: TextStyle(
-                          color: AppTheme.primaryTeal,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
+              IconButton(
+                icon: Icon(
+                  expanded
+                      ? CupertinoIcons.chevron_up
+                      : CupertinoIcons.chevron_down,
                 ),
+                onPressed: () {
+                  setState(() {
+                    _expandedDestinations[dest.id] = !expanded;
+                  });
+                },
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          if (destination.activities.isEmpty)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  'No activities yet',
-                  style: TextStyle(
-                    color: AppTheme.textSecondary.withValues(alpha: 0.6),
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            )
-          else
-            ...destination.activities.map(
-              (activity) => ActivityTile(
-                activity: activity,
+          if (expanded) ...[
+            const SizedBox(height: 12),
+            ...dest.activities.map(
+              (a) => ActivityTile(
+                activity: a,
                 onToggle: () {
-                  context.read<TripProvider>().toggleActivityCompletion(
+                  Provider.of<TripProvider>(
+                    context,
+                    listen: false,
+                  ).toggleActivityCompletion(
                     tripId: tripId,
-                    destinationId: destination.id,
-                    activityId: activity.id,
+                    destinationId: dest.id,
+                    activityId: a.id,
                   );
                 },
                 onDelete: () {
-                  context.read<TripProvider>().deleteActivity(
+                  Provider.of<TripProvider>(
+                    context,
+                    listen: false,
+                  ).deleteActivity(
                     tripId: tripId,
-                    destinationId: destination.id,
-                    activityId: activity.id,
+                    destinationId: dest.id,
+                    activityId: a.id,
                   );
                 },
               ),
             ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/add-activity',
+                    arguments: {'tripId': tripId, 'destinationId': dest.id},
+                  );
+                },
+                child: const Text('Add activity'),
+              ),
+            ),
+          ],
         ],
       ),
     );
   }
 
   Widget _buildFAB(BuildContext context, String tripId) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: AppTheme.primaryGradient,
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.primaryBlue.withValues(alpha: 0.4),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, '/add-destination', arguments: tripId);
-        },
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        child: const Icon(CupertinoIcons.location_solid, color: Colors.white),
-      ),
+    return FloatingActionButton(
+      onPressed: () {
+        Navigator.pushNamed(context, '/add-destination', arguments: tripId);
+      },
+      child: const Icon(CupertinoIcons.plus),
     );
   }
 
   void _showDeleteConfirmation(BuildContext context, String tripId) {
-    showCupertinoDialog(
+    showDialog(
       context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: const Text('Delete Trip'),
-        content: const Text(
-          'Are you sure you want to delete this trip? This action cannot be undone.',
-        ),
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete trip?'),
+        content: const Text('This action cannot be undone.'),
         actions: [
-          CupertinoDialogAction(
-            isDefaultAction: true,
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
             child: const Text('Cancel'),
-            onPressed: () => Navigator.pop(context),
           ),
-          CupertinoDialogAction(
-            isDestructiveAction: true,
-            child: const Text('Delete'),
+          TextButton(
             onPressed: () {
-              context.read<TripProvider>().deleteTrip(tripId);
-              Navigator.pop(context);
-              Navigator.pop(context);
+              Provider.of<TripProvider>(
+                context,
+                listen: false,
+              ).deleteTrip(tripId);
+              Navigator.popUntil(ctx, ModalRoute.withName('/'));
             },
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showDeleteDestinationConfirmation(
-    BuildContext context,
-    String tripId,
-    String destinationId,
-  ) {
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: const Text('Delete Destination'),
-        content: const Text(
-          'Are you sure you want to delete this destination and all its activities?',
-        ),
-        actions: [
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            child: const Text('Cancel'),
-            onPressed: () => Navigator.pop(context),
-          ),
-          CupertinoDialogAction(
-            isDestructiveAction: true,
-            child: const Text('Delete'),
-            onPressed: () {
-              context.read<TripProvider>().deleteDestination(
-                tripId: tripId,
-                destinationId: destinationId,
-              );
-              Navigator.pop(context);
-            },
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),

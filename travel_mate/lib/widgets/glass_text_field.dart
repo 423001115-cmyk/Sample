@@ -47,8 +47,8 @@ class GlassTextField extends StatelessWidget {
         readOnly: readOnly,
         onTap: onTap,
         validator: validator,
-        style: const TextStyle(
-          color: AppTheme.textPrimary,
+        style: TextStyle(
+          color: AppTheme.getTextPrimaryColor(context),
           fontSize: 16,
         ),
         decoration: InputDecoration(
@@ -64,36 +64,26 @@ class GlassTextField extends StatelessWidget {
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(
-              color: Colors.grey.shade300,
-              width: 1,
-            ),
+            borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(
-              color: AppTheme.primaryTeal,
-              width: 2,
-            ),
+            borderSide: const BorderSide(color: AppTheme.primaryTeal, width: 2),
           ),
           errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(
-              color: Colors.red,
-              width: 1,
-            ),
+            borderSide: const BorderSide(color: Colors.red, width: 1),
           ),
           focusedErrorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(
-              color: Colors.red,
-              width: 2,
-            ),
+            borderSide: const BorderSide(color: Colors.red, width: 2),
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 16,
+          ),
         ),
       ),
     );
   }
 }
-

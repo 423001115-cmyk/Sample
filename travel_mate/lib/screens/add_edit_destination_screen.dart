@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/trip_provider.dart';
+import '../providers/settings_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/gradient_background.dart';
 import '../widgets/glass_card.dart';
@@ -103,21 +104,36 @@ class _AddEditDestinationScreenState extends State<AddEditDestinationScreen> {
                     color: Colors.white.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     CupertinoIcons.back,
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.getTextPrimaryColor(context),
                   ),
                 ),
+              ),
+              const Spacer(),
+              Consumer<SettingsProvider>(
+                builder: (context, settings, child) {
+                  return IconButton(
+                    onPressed: () => settings.toggleTheme(),
+                    icon: Icon(
+                      settings.isDarkMode
+                          ? CupertinoIcons.sun_max
+                          : CupertinoIcons.moon,
+                      size: 24,
+                      color: AppTheme.getTextPrimaryColor(context),
+                    ),
+                  );
+                },
               ),
             ],
           ),
           const SizedBox(height: 16),
           Text(
             widget.isEditing ? 'Edit Destination' : 'New Destination',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: AppTheme.getTextPrimaryColor(context),
             ),
           ),
           const SizedBox(height: 8),
@@ -127,7 +143,9 @@ class _AddEditDestinationScreenState extends State<AddEditDestinationScreen> {
                 : 'Add a new destination to your trip',
             style: TextStyle(
               fontSize: 16,
-              color: AppTheme.textSecondary.withValues(alpha: 0.8),
+              color: AppTheme.getTextSecondaryColor(
+                context,
+              ).withValues(alpha: 0.8),
             ),
           ),
         ],
@@ -143,12 +161,12 @@ class _AddEditDestinationScreenState extends State<AddEditDestinationScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Destination Name',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
+                color: AppTheme.getTextPrimaryColor(context),
               ),
             ),
             const SizedBox(height: 8),
@@ -167,12 +185,12 @@ class _AddEditDestinationScreenState extends State<AddEditDestinationScreen> {
               },
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'Location',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
+                color: AppTheme.getTextPrimaryColor(context),
               ),
             ),
             const SizedBox(height: 8),
@@ -185,12 +203,12 @@ class _AddEditDestinationScreenState extends State<AddEditDestinationScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'Notes',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
+                color: AppTheme.getTextPrimaryColor(context),
               ),
             ),
             const SizedBox(height: 8),
@@ -198,11 +216,11 @@ class _AddEditDestinationScreenState extends State<AddEditDestinationScreen> {
               controller: _notesController,
               hintText: 'Add any notes about this destination (optional)',
               maxLines: 4,
-              prefixIcon: const Padding(
-                padding: EdgeInsets.only(bottom: 60),
+              prefixIcon: Padding(
+                padding: const EdgeInsets.only(bottom: 60),
                 child: Icon(
                   CupertinoIcons.doc_text,
-                  color: AppTheme.textSecondary,
+                  color: AppTheme.getTextSecondaryColor(context),
                 ),
               ),
             ),

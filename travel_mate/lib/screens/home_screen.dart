@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../models/trip.dart';
 import '../providers/trip_provider.dart';
+import '../providers/settings_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/gradient_background.dart';
 import '../widgets/glass_card.dart';
@@ -37,7 +38,7 @@ class HomeScreen extends StatelessWidget {
                   if (trips.isEmpty) {
                     return SliverFillRemaining(
                       hasScrollBody: false,
-                      child: _buildEmptyState(),
+                      child: _buildEmptyState(context),
                     );
                   }
                   return SliverPadding(
@@ -89,16 +90,25 @@ class HomeScreen extends StatelessWidget {
               'Plan your perfect journey',
               style: TextStyle(
                 fontSize: 16,
-                color: AppTheme.textSecondary.withValues(alpha: 0.8),
+                color: AppTheme.getTextSecondaryColor(
+                  context,
+                ).withValues(alpha: 0.8),
               ),
             ),
           ],
         ),
-        IconButton(
-          icon: const Icon(CupertinoIcons.settings, size: 28),
-          color: AppTheme.textPrimary,
-          onPressed: () {
-            Navigator.pushNamed(context, '/settings');
+        Consumer<SettingsProvider>(
+          builder: (context, settings, child) {
+            return IconButton(
+              icon: Icon(
+                settings.isDarkMode
+                    ? CupertinoIcons.sun_max
+                    : CupertinoIcons.moon,
+                size: 28,
+              ),
+              color: AppTheme.getTextPrimaryColor(context),
+              onPressed: () => settings.toggleTheme(),
+            );
           },
         ),
       ],
@@ -125,10 +135,10 @@ class HomeScreen extends StatelessWidget {
                 Expanded(
                   child: Text(
                     trip.name,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
+                      color: AppTheme.getTextPrimaryColor(context),
                     ),
                   ),
                 ),
@@ -158,7 +168,9 @@ class HomeScreen extends StatelessWidget {
                 trip.description,
                 style: TextStyle(
                   fontSize: 14,
-                  color: AppTheme.textSecondary.withValues(alpha: 0.8),
+                  color: AppTheme.getTextSecondaryColor(
+                    context,
+                  ).withValues(alpha: 0.8),
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
@@ -177,7 +189,9 @@ class HomeScreen extends StatelessWidget {
                   '${dateFormat.format(trip.startDate)} - ${dateFormat.format(trip.endDate)}',
                   style: TextStyle(
                     fontSize: 13,
-                    color: AppTheme.textSecondary.withValues(alpha: 0.8),
+                    color: AppTheme.getTextSecondaryColor(
+                      context,
+                    ).withValues(alpha: 0.8),
                   ),
                 ),
               ],
@@ -195,7 +209,9 @@ class HomeScreen extends StatelessWidget {
                   '${trip.destinations.length} destination${trip.destinations.length != 1 ? 's' : ''}',
                   style: TextStyle(
                     fontSize: 13,
-                    color: AppTheme.textSecondary.withValues(alpha: 0.8),
+                    color: AppTheme.getTextSecondaryColor(
+                      context,
+                    ).withValues(alpha: 0.8),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -209,7 +225,9 @@ class HomeScreen extends StatelessWidget {
                   '${trip.completedActivitiesCount}/${trip.totalActivities} activities',
                   style: TextStyle(
                     fontSize: 13,
-                    color: AppTheme.textSecondary.withValues(alpha: 0.8),
+                    color: AppTheme.getTextSecondaryColor(
+                      context,
+                    ).withValues(alpha: 0.8),
                   ),
                 ),
               ],
@@ -241,7 +259,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -257,7 +275,9 @@ class HomeScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w600,
-              color: AppTheme.textSecondary.withValues(alpha: 0.8),
+              color: AppTheme.getTextSecondaryColor(
+                context,
+              ).withValues(alpha: 0.8),
             ),
           ),
           const SizedBox(height: 8),
@@ -265,7 +285,9 @@ class HomeScreen extends StatelessWidget {
             'Tap the + button to plan your first adventure!',
             style: TextStyle(
               fontSize: 16,
-              color: AppTheme.textSecondary.withValues(alpha: 0.6),
+              color: AppTheme.getTextSecondaryColor(
+                context,
+              ).withValues(alpha: 0.6),
             ),
             textAlign: TextAlign.center,
           ),

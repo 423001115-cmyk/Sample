@@ -46,14 +46,26 @@ class AppTheme {
 
   static Color glassFillColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
-        ? Colors.black.withValues(alpha: 0.2)
-        : Colors.white.withValues(alpha: 0.2);
+        ? Colors.black.withOpacity(0.2)
+        : Colors.white.withOpacity(0.2);
   }
 
   static Color glassBorderColor(BuildContext context) {
     return Theme.of(context).brightness == Brightness.dark
-        ? Colors.white.withValues(alpha: 0.3)
-        : Colors.white.withValues(alpha: 0.3);
+        ? Colors.white.withOpacity(0.3)
+        : Colors.white.withOpacity(0.3);
+  }
+
+  static Color getTextPrimaryColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.white
+        : textPrimary;
+  }
+
+  static Color getTextSecondaryColor(BuildContext context) {
+    return Theme.of(context).brightness == Brightness.dark
+        ? Colors.grey.shade400
+        : textSecondary;
   }
 
   // Theme Data
@@ -176,7 +188,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.grey.shade800.withValues(alpha: 0.5),
+        fillColor: Colors.grey.shade800.withOpacity(0.5),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
@@ -193,7 +205,7 @@ class AppTheme {
           horizontal: 20,
           vertical: 16,
         ),
-        hintStyle: TextStyle(color: textSecondary.withValues(alpha: 0.7)),
+        hintStyle: TextStyle(color: Colors.grey.shade400),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(

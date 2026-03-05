@@ -5,8 +5,15 @@ class SettingsProvider with ChangeNotifier {
 
   bool get isDarkMode => _isDarkMode;
 
-  void setDarkMode(bool value) {
-    _isDarkMode = value;
+  void toggleTheme() {
+    _isDarkMode = !_isDarkMode;
     notifyListeners();
+  }
+
+  void setDarkMode(bool value) {
+    if (_isDarkMode != value) {
+      _isDarkMode = value;
+      notifyListeners();
+    }
   }
 }

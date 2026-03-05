@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../providers/trip_provider.dart';
+import '../providers/settings_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/gradient_background.dart';
 import '../widgets/glass_card.dart';
@@ -95,21 +96,36 @@ class _AddEditTripScreenState extends State<AddEditTripScreen> {
                     color: Colors.white.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     CupertinoIcons.back,
-                    color: AppTheme.textPrimary,
+                    color: AppTheme.getTextPrimaryColor(context),
                   ),
                 ),
+              ),
+              const Spacer(),
+              Consumer<SettingsProvider>(
+                builder: (context, settings, child) {
+                  return IconButton(
+                    onPressed: () => settings.toggleTheme(),
+                    icon: Icon(
+                      settings.isDarkMode
+                          ? CupertinoIcons.sun_max
+                          : CupertinoIcons.moon,
+                      size: 24,
+                      color: AppTheme.getTextPrimaryColor(context),
+                    ),
+                  );
+                },
               ),
             ],
           ),
           const SizedBox(height: 16),
           Text(
             widget.isEditing ? 'Edit Trip' : 'New Trip',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: AppTheme.textPrimary,
+              color: AppTheme.getTextPrimaryColor(context),
             ),
           ),
           const SizedBox(height: 8),
@@ -119,7 +135,9 @@ class _AddEditTripScreenState extends State<AddEditTripScreen> {
                 : 'Plan your next adventure',
             style: TextStyle(
               fontSize: 16,
-              color: AppTheme.textSecondary.withValues(alpha: 0.8),
+              color: AppTheme.getTextSecondaryColor(
+                context,
+              ).withValues(alpha: 0.8),
             ),
           ),
         ],
@@ -137,12 +155,12 @@ class _AddEditTripScreenState extends State<AddEditTripScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Trip Name',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
+                color: AppTheme.getTextPrimaryColor(context),
               ),
             ),
             const SizedBox(height: 8),
@@ -157,12 +175,12 @@ class _AddEditTripScreenState extends State<AddEditTripScreen> {
               },
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'Description',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
+                color: AppTheme.getTextPrimaryColor(context),
               ),
             ),
             const SizedBox(height: 8),
@@ -172,12 +190,12 @@ class _AddEditTripScreenState extends State<AddEditTripScreen> {
               maxLines: 3,
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'Start Date',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
+                color: AppTheme.getTextPrimaryColor(context),
               ),
             ),
             const SizedBox(height: 8),
@@ -187,12 +205,12 @@ class _AddEditTripScreenState extends State<AddEditTripScreen> {
               onTap: () => _selectDate(isStartDate: true),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'End Date',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: AppTheme.textPrimary,
+                color: AppTheme.getTextPrimaryColor(context),
               ),
             ),
             const SizedBox(height: 8),
@@ -243,12 +261,15 @@ class _AddEditTripScreenState extends State<AddEditTripScreen> {
             const SizedBox(width: 12),
             Text(
               formattedDate,
-              style: const TextStyle(fontSize: 16, color: AppTheme.textPrimary),
+              style: TextStyle(
+                fontSize: 16,
+                color: AppTheme.getTextPrimaryColor(context),
+              ),
             ),
             const Spacer(),
             Icon(
               CupertinoIcons.chevron_down,
-              color: AppTheme.textSecondary,
+              color: AppTheme.getTextSecondaryColor(context),
               size: 18,
             ),
           ],

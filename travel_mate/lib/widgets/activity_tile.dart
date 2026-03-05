@@ -51,11 +51,7 @@ class ActivityTile extends StatelessWidget {
               ),
             ),
             child: activity.isCompleted
-                ? const Icon(
-                    Icons.check,
-                    color: Colors.white,
-                    size: 18,
-                  )
+                ? const Icon(Icons.check, color: Colors.white, size: 18)
                 : null,
           ),
         ),
@@ -63,12 +59,13 @@ class ActivityTile extends StatelessWidget {
           duration: const Duration(milliseconds: 200),
           style: TextStyle(
             color: activity.isCompleted
-                ? AppTheme.textSecondary
-                : AppTheme.textPrimary,
+                ? AppTheme.getTextSecondaryColor(context)
+                : AppTheme.getTextPrimaryColor(context),
             fontSize: 16,
-            decoration:
-                activity.isCompleted ? TextDecoration.lineThrough : null,
-            decorationColor: AppTheme.textSecondary,
+            decoration: activity.isCompleted
+                ? TextDecoration.lineThrough
+                : null,
+            decorationColor: AppTheme.getTextSecondaryColor(context),
           ),
           child: Text(activity.name),
         ),
@@ -84,4 +81,3 @@ class ActivityTile extends StatelessWidget {
     );
   }
 }
-
